@@ -272,7 +272,7 @@
 </head>
 <body>
     <h1>
-        Warcraft 3 Hotkey Editor
+        komoset's WC3 Hotkey Editor
         <button id="infoButton" style="background: none; border: none; padding: 0; cursor: pointer; vertical-align: middle;">
             <img src="info.png" alt="Info" width="64" height="64">
         </button>
@@ -403,6 +403,7 @@
             <p><strong>3. Quickcast:</strong> Check the "QC" box on a slot to enable quickcast for that hotkey, or use "Quickcast All" to toggle all slots. Quickcast makes all your spells cast immediately on your cursor when you use the spell, without the need to left-click to confirm the target.</p>   
             <p><strong>4. Save Hotkeys:</strong> Click "Save Hotkeys" to download your updated War3Preferences.txt file. Save it to <code>Documents\Warcraft III\War3Preferences.txt</code> and overwrite the old file to apply your changes in-game.</p>
             <p><strong>5. Reset:</strong> Click "Reset Hotkeys" to clear all hotkeys and quickcast settings.</p>
+            <p><i>Note that this hotkey editor automatically enables grid mode hotkeys and will not work if you disable grid mode hotkeys in the game</i></p>
         </div>
     </div>
     <script>
@@ -423,7 +424,7 @@
         const warningText = document.getElementById("warning");
         const errorText = document.getElementById("error");
         const dropZone = document.getElementById("dropZone");
-
+    
         buttons.forEach(button => {
             button.addEventListener("click", (event) => {
                 if (event.target.type !== "checkbox") {
@@ -434,7 +435,7 @@
                 }
             });
         });
-
+    
         inventoryButtons.forEach(button => {
             button.addEventListener("click", (event) => {
                 if (event.target.type !== "checkbox") {
@@ -445,14 +446,14 @@
                 }
             });
         });
-
+    
         function checkDuplicates() {
             const allHotkeys = { ...hotkeys, ...inventoryHotkeys };
             const values = Object.values(allHotkeys);
             const hasDuplicates = values.some((val, i) => values.indexOf(val) !== i && val !== undefined);
             warningText.style.display = hasDuplicates ? "block" : "none";
         }
-
+    
         document.addEventListener("keydown", (event) => {
             if (selectedSlot !== null) {
                 const keyCode = event.keyCode;
@@ -469,14 +470,14 @@
                 checkDuplicates();
             }
         });
-
+    
         function loadFile(event) {
             const file = event.target.files[0];
             if (!file) return;
-            errorText.style.display = "none"; // Reset error message
+            errorText.style.display = "none";
             processFile(file);
         }
-
+    
         function processFile(file) {
             const reader = new FileReader();
             reader.onload = function(e) {
@@ -486,7 +487,7 @@
                 let sectionContent = [];
                 unchangedFileData = "";
                 let hasValidHotkeys = false;
-
+    
                 lines.forEach(line => {
                     const trimmedLine = line.trim();
                     if (trimmedLine.startsWith('[')) {
@@ -528,11 +529,11 @@
                         }
                     }
                 });
-
+    
                 if (currentSection && !currentSection.match(/^\[(Commandbar Hotkeys|Inventory Hotkeys)/)) {
                     unchangedFileData += sectionContent.join('\n') + '\n';
                 }
-
+    
                 if (!hasValidHotkeys || !content.trim()) {
                     errorText.style.display = "block";
                     dropZone.style.display = "none";
@@ -544,7 +545,7 @@
             };
             reader.readAsText(file);
         }
-
+    
         function saveFile() {
             let fileContent = "";
             commandbarSlotOrder.forEach(slot => {
@@ -567,14 +568,14 @@
                     fileContent += `QuickCast=${quickcast}\n\n`;
                 }
             });
-            fileContent += unchangedFileData.trim();
+            fileContent += unchangedFileData.replace(/customkeys=\d+/, 'customkeys=2').trim();
             const blob = new Blob([fileContent], { type: "text/plain" });
             const link = document.createElement("a");
             link.href = URL.createObjectURL(blob);
             link.download = "War3Preferences.txt";
             link.click();
         }
-
+    
         function resetHotkeys() {
             for (let slot in hotkeys) delete hotkeys[slot];
             for (let slot in inventoryHotkeys) delete inventoryHotkeys[slot];
@@ -591,53 +592,53 @@
             selectedSlot = null;
             checkDuplicates();
         }
-
+    
         function toggleQuickcastAll() {
             const allChecked = Array.from(quickcastCheckboxes).every(cb => cb.checked) &&
                               Array.from(inventoryQuickcastCheckboxes).every(cb => cb.checked);
             quickcastCheckboxes.forEach(checkbox => checkbox.checked = !allChecked);
             inventoryQuickcastCheckboxes.forEach(checkbox => checkbox.checked = !allChecked);
         }
-
+    
         function revealContent() {
             document.querySelectorAll('.hidden').forEach(element => {
                 element.classList.remove('hidden');
             });
             document.querySelector('.load-button-container').style.display = 'none';
         }
-
+    
         document.addEventListener("dragover", (event) => {
             event.preventDefault();
             dropZone.style.display = "flex";
         });
-
+    
         document.addEventListener("dragleave", (event) => {
             event.preventDefault();
             dropZone.style.display = "none";
         });
-
+    
         document.addEventListener("drop", (event) => {
             event.preventDefault();
             const file = event.dataTransfer.files[0];
             if (file && file.name.endsWith(".txt")) {
-                errorText.style.display = "none"; // Reset error message
+                errorText.style.display = "none";
                 processFile(file);
             } else {
                 errorText.style.display = "block";
                 dropZone.style.display = "none";
             }
         });
-
+    
         document.getElementById("infoButton").addEventListener("click", () => {
             document.getElementById("infoBox").style.display = "flex";
         });
-
+    
         document.getElementById("infoBox").addEventListener("click", (event) => {
             if (event.target === document.getElementById("infoBox")) {
                 document.getElementById("infoBox").style.display = "none";
             }
         });
-
+    
         function closeInfoBox() {
             document.getElementById("infoBox").style.display = "none";
         }
