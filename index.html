@@ -87,10 +87,10 @@
             width: 64px;
             height: 64px;
             font-size: 25px;
-            background-color: rgba(74, 105, 115, 0.0); /*test   d*/
+            background-color: rgba(74, 105, 115, 0.0); 
             color: #b0e0e6;
             border: 2px solid #4a6973;
-            border-radius: 10px;/*test   d*/
+            border-radius: 10px;
             cursor: pointer;
             transition: all 0.3s ease;
             position: relative;
@@ -147,6 +147,44 @@
             color: #1a2a2f;
             box-shadow: 0 4px 12px rgba(64, 196, 255, 0.4);
         }
+        .controls button:active {
+            transform: scale(0.95);
+        }
+        .load-button-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .load-button-text {
+            font-size: 30px;
+            color: #80deea;
+            margin-bottom: 10px;
+            text-shadow: 1px 1px 2px #0a1417;
+        }
+        .load-button {
+            padding: 5px 20px;
+            width: 220px;
+            font-size: 20px;
+            background: linear-gradient(45deg, #4a6973, #406f80);
+            color: #b0e0e6;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+        .load-button:hover {
+            background: linear-gradient(45deg, #40c4ff, #2a8ab7);
+            color: #1a2a2f;
+            box-shadow: 0 4px 12px rgba(64, 196, 255, 0.4);
+        }
+        .load-button:active {
+            transform: scale(0.95);
+        }
         p {
             font-size: 16px;
             color: #80deea;
@@ -157,6 +195,13 @@
             color: #ff5555;
             font-size: 16px;
             display: none;
+            text-shadow: 1px 1px 2px #0a1417;
+        }
+        #error {
+            color: #ff5555;
+            font-size: 16px;
+            display: none;
+            margin-top: 10px;
             text-shadow: 1px 1px 2px #0a1417;
         }
         #dropZone {
@@ -181,11 +226,64 @@
             font-size: 20px;
             text-align: center;
         }
+        #infoButton {
+            transition: all 0.3s ease;
+        }
+        #infoButton:active {
+            transform: scale(0.95);
+        }
+        #infoBox {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(20, 75, 92, 0.6);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+        #infoContent {
+            background: rgba(37, 54, 59, 0.9);
+            padding: 25px;
+            border-radius: 15px;
+            color: #e0f7fa;
+            font-size: 16px;
+            text-align: left;
+            max-width: 550px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(64, 196, 255, 0.3);
+            backdrop-filter: blur(5px);
+        }
+        #infoContent h2 {
+            color: #40c4ff;
+            text-shadow: 1px 1px 2px #0a1417;
+            margin-top: 0;
+        }
+        #infoContent p {
+            margin: 10px 0;
+        }
+        .hidden {
+            display: none;
+        }
     </style>
 </head>
 <body>
-    <h1>Warcraft 3 Hotkey Editor</h1>
-    <div class="container">
+    <h1>
+        Warcraft 3 Hotkey Editor
+        <button id="infoButton" style="background: none; border: none; padding: 0; cursor: pointer; vertical-align: middle;">
+            <img src="info.png" alt="Info" width="64" height="64">
+        </button>
+    </h1>
+    <div class="load-button-container">
+        <div class="load-button-text">Click "Load File" or drag and drop a War3Preferences.txt file to load your hotkeys and get started. This file is usually located in: <code>Documents\Warcraft III\War3Preferences.txt</code>.</div>
+        <button class="load-button" onclick="document.getElementById('initialFileInput').click()">Load File</button>
+        <input type="file" id="initialFileInput" style="display: none;" accept=".txt" onchange="loadFile(event)">
+        <p id="error">Error: Invalid War3Preferences.txt file.</p>
+    </div>
+    <div class="container hidden">
         <div class="inventory-grid-container">
             <div class="inventory-grid" id="inventoryHotkeyGrid">
                 <div class="slot">
@@ -292,10 +390,20 @@
             <input type="file" id="fileInput" style="display: none;" accept=".txt" onchange="loadFile(event)">
         </div>
     </div>
-    <p>Click a slot, then press a key to set the hotkey.</p>
-    <p id="warning">Warning: Multiple slots are bound to the same key.</p>
+    <p class="hidden">Click a slot, then press a key to set the hotkey.</p>
+    <p id="warning" class="hidden">Warning: Multiple slots are bound to the same key.</p>
     <div id="dropZone">
         <div id="dropBox">Drop your War3Preferences.txt file here</div>
+    </div>
+    <div id="infoBox" class="hidden">
+        <div id="infoContent">
+            <h2>Using this Hotkey Editor</h2>
+            <p><strong>1. Load File:</strong> Click "Load File" or drag and drop a War3Preferences.txt file to load existing hotkeys. This file is usually located in <code>Documents\Warcraft III\War3Preferences.txt</code>.</p>
+            <p><strong>2. Set Hotkeys:</strong> Click a slot in the grid or inventory, then press a key to assign it.</p>
+            <p><strong>3. Quickcast:</strong> Check the "QC" box on a slot to enable quickcast for that hotkey, or use "Quickcast All" to toggle all slots. Quickcast makes all your spells cast immediately on your cursor when you use the spell, without the need to left-click to confirm the target.</p>   
+            <p><strong>4. Save Hotkeys:</strong> Click "Save Hotkeys" to download your updated War3Preferences.txt file. Save it to <code>Documents\Warcraft III\War3Preferences.txt</code> and overwrite the old file to apply your changes in-game.</p>
+            <p><strong>5. Reset:</strong> Click "Reset Hotkeys" to clear all hotkeys and quickcast settings.</p>
+        </div>
     </div>
     <script>
         let selectedSlot = null;
@@ -313,6 +421,7 @@
         const quickcastCheckboxes = document.querySelectorAll(".quickcast");
         const inventoryQuickcastCheckboxes = document.querySelectorAll(".inventory-quickcast");
         const warningText = document.getElementById("warning");
+        const errorText = document.getElementById("error");
         const dropZone = document.getElementById("dropZone");
 
         buttons.forEach(button => {
@@ -364,8 +473,8 @@
         function loadFile(event) {
             const file = event.target.files[0];
             if (!file) return;
+            errorText.style.display = "none"; // Reset error message
             processFile(file);
-            dropZone.style.display = "none";
         }
 
         function processFile(file) {
@@ -376,6 +485,7 @@
                 let currentSection = null;
                 let sectionContent = [];
                 unchangedFileData = "";
+                let hasValidHotkeys = false;
 
                 lines.forEach(line => {
                     const trimmedLine = line.trim();
@@ -388,6 +498,9 @@
                         }
                         currentSection = trimmedLine;
                         sectionContent.push(line);
+                        if (currentSection.match(/^\[(Commandbar Hotkeys|Inventory Hotkeys)/)) {
+                            hasValidHotkeys = true;
+                        }
                     } else if (trimmedLine && currentSection) {
                         sectionContent.push(line);
                         if (currentSection.match(/^\[Commandbar Hotkeys (\d{2})\]/)) {
@@ -419,7 +532,15 @@
                 if (currentSection && !currentSection.match(/^\[(Commandbar Hotkeys|Inventory Hotkeys)/)) {
                     unchangedFileData += sectionContent.join('\n') + '\n';
                 }
-                checkDuplicates();
+
+                if (!hasValidHotkeys || !content.trim()) {
+                    errorText.style.display = "block";
+                    dropZone.style.display = "none";
+                } else {
+                    revealContent();
+                    dropZone.style.display = "none";
+                    checkDuplicates();
+                }
             };
             reader.readAsText(file);
         }
@@ -478,6 +599,13 @@
             inventoryQuickcastCheckboxes.forEach(checkbox => checkbox.checked = !allChecked);
         }
 
+        function revealContent() {
+            document.querySelectorAll('.hidden').forEach(element => {
+                element.classList.remove('hidden');
+            });
+            document.querySelector('.load-button-container').style.display = 'none';
+        }
+
         document.addEventListener("dragover", (event) => {
             event.preventDefault();
             dropZone.style.display = "flex";
@@ -490,12 +618,29 @@
 
         document.addEventListener("drop", (event) => {
             event.preventDefault();
-            dropZone.style.display = "none";
             const file = event.dataTransfer.files[0];
             if (file && file.name.endsWith(".txt")) {
+                errorText.style.display = "none"; // Reset error message
                 processFile(file);
+            } else {
+                errorText.style.display = "block";
+                dropZone.style.display = "none";
             }
         });
+
+        document.getElementById("infoButton").addEventListener("click", () => {
+            document.getElementById("infoBox").style.display = "flex";
+        });
+
+        document.getElementById("infoBox").addEventListener("click", (event) => {
+            if (event.target === document.getElementById("infoBox")) {
+                document.getElementById("infoBox").style.display = "none";
+            }
+        });
+
+        function closeInfoBox() {
+            document.getElementById("infoBox").style.display = "none";
+        }
     </script>
 </body>
 </html>
